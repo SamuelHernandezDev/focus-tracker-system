@@ -1,4 +1,6 @@
+//frontend\app\layout.tsx
 import "./globals.css";
+import { AuthProvider } from "@/modules/auth/context/AuthContext";
 import Link from "next/link";
 
 export default function RootLayout({
@@ -9,13 +11,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <nav className="p-4 border-b flex gap-4">
-          <Link href="/">Home</Link>
-          <Link href="/dashboard">Dashboard</Link>
-          <Link href="/session">Session</Link>
-        </nav>
+        <AuthProvider>
+          <nav className="p-4 border-b flex gap-4">
+            <Link href="/">Home</Link>
+            <Link href="/dashboard">Dashboard</Link>
+            <Link href="/session">Session</Link>
+          </nav>
 
-        {children}
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

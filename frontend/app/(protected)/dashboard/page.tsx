@@ -2,7 +2,6 @@
 //frontend/app/dashboard/page.tsx
 "use client";
 
-import ProtectedRoute from "@/modules/auth/components/ProtectedRoute";
 import { useAuth } from "@/modules/auth/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
@@ -16,7 +15,6 @@ export default function DashboardPage() {
   };
 
   return (
-    <ProtectedRoute>
       <div className="p-10 space-y-8">
         {/* Header */}
         <div className="flex justify-between items-center">
@@ -85,6 +83,5 @@ export default function DashboardPage() {
           </button>
         </div>
       </div>
-    </ProtectedRoute>
   );
 }

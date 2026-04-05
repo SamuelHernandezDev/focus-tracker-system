@@ -1,15 +1,12 @@
 //frontend\app\session\page.tsx
-//frontend/app/session/page.tsx
 "use client";
 
-import ProtectedRoute from "@/modules/auth/components/ProtectedRoute";
 import { useAuth } from "@/modules/auth/hooks/useAuth";
 
 export default function SessionPage() {
   const { user } = useAuth();
 
   return (
-    <ProtectedRoute>
       <div className="p-10 space-y-6">
         <h1 className="text-xl font-semibold">Focus Session</h1>
 
@@ -54,6 +51,5 @@ export default function SessionPage() {
           </div>
         </div>
       </div>
-    </ProtectedRoute>
   );
 }

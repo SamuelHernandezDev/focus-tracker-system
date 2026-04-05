@@ -6,45 +6,55 @@
 
 The frontend is responsible for:
 
-- Capturing user interaction (focus sessions)
-- Visualizing metrics and indicators
-- Displaying feedback and recommendations
-- Managing session flow
-- Providing an intuitive user experience
+* Managing authentication flow (login, logout, persistence)
+* Capturing user interaction (focus sessions)
+* Visualizing metrics and indicators
+* Displaying feedback and recommendations
+* Managing session lifecycle
+* Providing a clean and intuitive UI
 
 The application is built using:
 
-- **Next.js (React framework)**
-- **Tailwind CSS (UI styling)**
-- **Client-side event tracking**
+* **Next.js (App Router)**
+* **React (Client Components where needed)**
+* **Tailwind CSS**
+* **Context API (Auth state)**
 
 ---
 
 ## 🔹Core Responsibilities
 
-- UI rendering
-- Event capture
-- State management
-- Data visualization
-- Communication with backend API
+* UI rendering
+* Authentication state management
+* Route protection
+* Event capture (future)
+* Data visualization
+* Communication with backend API
 
 ---
 
 ## 🔹High-Level Structure
 
-The frontend is organized into:
-
 ```
 /app
-/components
+  layout.tsx
+  page.tsx
+  /login
+  /(protected)
+    /dashboard
+    /session
+
 /modules
+  /auth
+    /components
+    /context
+    /hooks
+    /types
+
 /services
 /hooks
-/store
-/types
 /utils
 /styles
-
 ```
 
 ---
@@ -52,19 +62,53 @@ The frontend is organized into:
 ## 🔹Application Flow
 
 ```
-User Interaction → Event Capture → API → Response → UI Update
+User → Login → AuthContext → Protected Routes → Features → API → UI Update
 ```
 
 ---
 
 ## 🔹Routing (Next.js App Router)
 
-Main routes:
+### 🔸Public Routes
 
-* `/` → Dashboard
+* `/` → Landing (Home)
+* `/login` → Authentication
+
+### 🔸Protected Routes
+
+* `/dashboard` → Metrics overview
 * `/session` → Active session
-* `/results` → Session results
-* `/history` → Previous sessions
+
+### 🔐 Protection Strategy
+
+* Route grouping using `(protected)`
+* `ProtectedRoute` component
+* Redirect unauthenticated users → `/login`
+
+---
+
+## 🔹Authentication Architecture
+
+### 🔸AuthContext
+
+Handles:
+
+* `user` state
+* `loading` state
+* `login()`
+* `logout()`
+
+### 🔸Persistence
+
+* Stored in `localStorage`
+* Restored on app load
+
+### 🔸Flow
+
+```
+Login → setUser → localStorage → ProtectedRoute → Access granted
+Logout → clearUser → redirect → Access denied
+```
 
 ---
 
@@ -72,86 +116,70 @@ Main routes:
 
 ---
 
-### 🔸Session Module
+### 🔸Auth Module
 
-Handles focus session lifecycle.
+Handles authentication logic.
 
-#### Responsibilities:
+#### Includes:
 
-* Start session
-* Track activity
-* Detect inactivity
-* End session
-
-#### Components:
-
-* `SessionScreen`
-* `SessionTimer`
-* `ActivityTracker`
-
----
-
-### 🔸Events Module
-
-Captures user behavior.
-
-#### Events:
-
-* mouse movement
-* keyboard activity
-* tab visibility
-* inactivity periods
-
-#### Files:
-
-* `useEventTracker.ts`
-* `event.service.ts`
+* `AuthContext`
+* `useAuth`
+* `ProtectedRoute`
+* `LoginForm`
 
 ---
 
 ### 🔸Dashboard Module
 
-Displays metrics and insights.
+Displays user overview.
 
-#### Components:
+#### Current Features:
 
-* `MetricsCard`
-* `Charts`
-* `SessionSummary`
+* Metrics cards (mock)
+* Recent sessions (mock)
+* Quick actions
 
----
+#### Future:
 
-### 🔸Results Module
-
-Displays evaluation of a session.
-
-#### Includes:
-
-* Metrics
-* Indicators
-* AI Feedback
-
-#### Components:
-
-* `ResultsSummary`
-* `FeedbackCard`
-* `RecommendationsList`
+* Real metrics
+* Charts
+* Historical trends
 
 ---
 
-### 🔸History Module
+### 🔸Session Module
 
-Displays past sessions.
+Handles focus sessions.
 
-* Session list
-* Comparisons
-* Trends
+#### Current:
+
+* UI structure
+* Session controls (mock)
+
+#### Future:
+
+* Timer logic
+* Event tracking
+* Session lifecycle
 
 ---
 
-### 🔸Feedback Module
+### 🔸Events Module (Planned)
 
-Handles AI-generated feedback rendering.
+Captures user behavior.
+
+#### Events:
+
+* Mouse activity
+* Keyboard input
+* Tab visibility
+* Inactivity
+
+---
+
+### 🔸Feedback Module (Planned)
+
+Displays AI-generated insights.
 
 * Summary
 * Detailed explanation
@@ -161,10 +189,14 @@ Handles AI-generated feedback rendering.
 
 ## 🔹State Management
 
-Options:
+Current:
 
-* React Context (MVP)
+* React Context (Auth)
+
+Future:
+
 * Zustand (recommended for scaling)
+* Separation of UI vs domain state
 
 ---
 
@@ -172,86 +204,88 @@ Options:
 
 Handles communication with backend.
 
-#### Files:
+#### Planned Services:
 
-* `/services/api.ts`
-* `/services/session.service.ts`
-* `/services/events.service.ts`
+```
+/services/api.ts
+/services/auth.service.ts
+/services/session.service.ts
+/services/events.service.ts
+```
 
 ---
 
 ## 🔹Data Flow
 
 ```
-UI → Event Capture → Backend → Metrics → Indicators → Feedback → UI
+Session → Events → Backend → Metrics → Indicators → Feedback → UI
 ```
-
----
-
-## 🔹Visualization Strategy
-
-Use charts for:
-
-* Active vs inactive time
-* Session timeline
-* Focus score
-
-Suggested libraries:
-
-* Recharts
-* Chart.js
 
 ---
 
 ## 🔹UI/UX Principles
 
-* Minimal distractions
-* Clear feedback
-* Visual clarity
-* Real-time responsiveness
+* Clean and minimal interface
+* Clear navigation
+* Immediate feedback
+* Progressive enhancement
+* No unnecessary friction
 
 ---
 
 ## 🔹Styling
 
 * Tailwind CSS
+* CSS variables for theming
 * Component-based styling
-* Dark/light mode support (future)
+* Light/Dark mode ready
 
 ---
 
 ## 🔹Performance Considerations
 
-* Debounce event tracking
-* Batch API calls
-* Avoid excessive re-renders
+* Avoid unnecessary re-renders
+* Lazy load components when needed
+* Batch future event requests
+* Optimize client-side logic
+
+---
+
+## 🔹Security Considerations
+
+* Route protection via client guards
+* No sensitive data stored in frontend
+* LocalStorage used only for session persistence
 
 ---
 
 ## 🔹Future Improvements
 
-* Real-time updates (WebSockets)
-* Advanced charts
-* Gamification
-* Notifications
+* Global layout with sidebar (SaaS style)
+* Real-time session tracking
+* Charts and analytics
+* AI feedback visualization
+* Notifications system
+* Role-based access (if needed)
 
 ---
 
 ## 🔹Design Decisions
 
-* Next.js for scalability
-* Modular architecture
-* Clear separation of UI and logic
-* Backend-driven data
+* Next.js App Router for scalability
+* Route-based protection instead of per-page guards
+* Context API for MVP simplicity
+* Modular architecture for future separation
+* UI-first development for rapid iteration
 
 ---
 
 ## 🔹MVP Scope
 
-* Session tracking working
-* Events captured correctly
-* Dashboard basic metrics
-* Feedback displayed
+* Authentication flow working
+* Persistent login
+* Protected routing implemented
+* Dashboard UI (mock data)
+* Session UI (base structure)
 
-```
-
+---

@@ -3,16 +3,9 @@
 "use client";
 
 import { useAuth } from "@/modules/auth/hooks/useAuth";
-import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
-  const { user, logout } = useAuth();
-  const router = useRouter();
-
-  const handleLogout = () => {
-    logout();
-    router.push("/login");
-  };
+  const { user} = useAuth();
 
   return (
       <div className="p-10 space-y-8">
@@ -24,13 +17,6 @@ export default function DashboardPage() {
               Welcome back, {user?.email}
             </p>
           </div>
-
-          <button
-            onClick={handleLogout}
-            className="rounded-md bg-red-500 text-white px-4 py-2 hover:opacity-90"
-          >
-            Logout
-          </button>
         </div>
 
         {/* Metrics */}

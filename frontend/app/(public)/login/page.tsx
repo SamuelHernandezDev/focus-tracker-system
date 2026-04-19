@@ -1,4 +1,4 @@
-//frontend\app\login\page.tsx
+//frontend\app\(public)\login\page.tsx
 import LoginForm from "@/modules/auth/components/LoginForm";
 
 export default function LoginPage() {

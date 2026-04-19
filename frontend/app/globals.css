@@ -2,8 +2,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc; /* gris muy claro */
-  --foreground: #0f172a; /* slate-900 */
+  --background: #f8fafc; 
+  --foreground: #0f172a; 
   --card: #ffffff;
   --border: #e2e8f0;
   --primary: #2563eb;
@@ -32,4 +32,31 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: system-ui, sans-serif;
+}
+
+.section-title {
+  @apply text-lg font-medium mb-4;
+}
+
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none !important;
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(4px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.05) translateY(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-popIn {
+  animation: popIn 0.25s ease-out;
 }

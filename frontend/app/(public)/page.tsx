@@ -1,4 +1,4 @@
-//frontend\app\page.tsx
+//frontend\app\(public)\page.tsx
 "use client";
 
 import Link from "next/link";

@@ -15,16 +15,14 @@ export default function ProtectedRoute({
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/login");
+      router.replace("/login");
     }
   }, [user, loading, router]);
 
-  // 🔹 Evita render mientras carga
   if (loading) {
-    return <div className="p-10">Loading...</div>;
+    return <div className="p-8">Loading...</div>;
   }
 
-  // 🔹 Evita flash si no hay user
   if (!user) return null;
 
   return <>{children}</>;

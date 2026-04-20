@@ -4,16 +4,25 @@ import {
     NotFoundException,
     BadRequestException,
   } from '@nestjs/common';
+  
   import { Session } from './types/session.type';
+  import { Event } from './types/event.type';
+  
   import { StartSessionDto } from './dto/start-session.dto';
+  import { CreateEventDto } from './dto/create-event.dto';
+  
   import { randomUUID } from 'crypto';
   
   @Injectable()
   export class SessionsService {
     private sessions: Session[] = [];
+    private events: Event[] = []; 
+  
+    // ======================
+    // SESSION LIFECYCLE
+    // ======================
   
     startSession(userId: string, dto: StartSessionDto): Session {
-      
       const activeSession = this.sessions.find(
         (s) => s.userId === userId && s.endTime === null,
       );
@@ -56,5 +65,39 @@ import {
   
     getSessionsByUser(userId: string): Session[] {
       return this.sessions.filter((s) => s.userId === userId);
+    }
+  
+    // ======================
+    // EVENTS
+    // ======================
+  
+    createEvent(dto: CreateEventDto): Event {
+      const session = this.sessions.find(
+        (s) => s.id === dto.sessionId,
+      );
+  
+      if (!session) {
+        throw new NotFoundException('Session not found');
+      }
+  
+      if (session.endTime) {
+        throw new BadRequestException('Session already finished');
+      }
+  
+      const event: Event = {
+        id: randomUUID(),
+        sessionId: dto.sessionId,
+        type: dto.type,
+        value: dto.value,
+        timestamp: new Date(),
+      };
+  
+      this.events.push(event);
+  
+      return event;
+    }
+  
+    getEventsBySession(sessionId: string): Event[] {
+      return this.events.filter((e) => e.sessionId === sessionId);
     }
   }

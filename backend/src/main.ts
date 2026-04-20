@@ -1,14 +1,26 @@
-//backend\src\main.ts
+// backend/src/main.ts
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import cookieParser from 'cookie-parser'; 
+import { ValidationPipe } from '@nestjs/common';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.use(cookieParser()); 
+  // COOKIES
+  app.use(cookieParser());
 
+  // VALIDATION 
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+
+  // CORS
   app.enableCors({
     origin: [
       "http://localhost:3000",

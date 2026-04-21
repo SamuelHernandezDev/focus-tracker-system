@@ -25,7 +25,6 @@ export class JwtAuthGuard implements CanActivate {
     try {
       const payload = this.jwtService.verify<JwtPayload>(token);
 
-      // 👇 tipado más limpio
       request['user'] = {
         id: payload.sub,
         email: payload.email,

@@ -10,6 +10,11 @@ type Session = {
   duration: number;
   score: number;
   interruptions: number;
+
+  focusTime?: number;
+  idleTime?: number;
+  distractions?: number;
+  task?: string;
 };
 
 type Props = {

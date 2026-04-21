@@ -10,7 +10,21 @@ type Session = {
   duration: number;
   score: number;
   interruptions: number;
+
+  focusTime?: number;
+  idleTime?: number;
+  distractions?: number;
+  task?: string;
+
+  topDomains?: {
+    domain: string;
+    time: number;
+    category: string;
+    isDistraction: boolean;
+  }[];
 };
+
+
 
 type Props = {
   item: Session;

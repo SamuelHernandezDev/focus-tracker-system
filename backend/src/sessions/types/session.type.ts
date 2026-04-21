@@ -4,12 +4,29 @@ export type Session = {
     userId: string;
     task: string;
     allowedSites?: string[];
+  
     startTime: Date;
     endTime: Date | null;
   
-    // métricas (futuro)
+    // ======================
+    // METRICS
+    // ======================
     focusTime?: number;
     idleTime?: number;
     interruptions?: number;
+    distractions?: number;
     score?: number;
+
+    topDomains?: {
+      domain: string;
+      time: number;
+      category: string;
+      relevant: boolean;
+      isDistraction: boolean;
+    }[];
+  
+    // ======================
+    // FUTURE (AI)
+    // ======================
+    feedback?: string;
   };

@@ -1,7 +1,7 @@
 //frontend\app\(app)\focus\page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Brain,
   Globe,
@@ -11,88 +11,45 @@ import {
   Activity,
 } from "lucide-react";
 
-import {
-  startSessionRequest,
-  stopSessionRequest,
-  sendEventRequest,
-} from "@/services/session/session.service";
+import { useFocusSession } from "@/modules/focus/hooks/useFocusSession";
 
 export default function FocusPage() {
   const [task, setTask] = useState("");
   const [allowedSites, setAllowedSites] = useState("");
   const [cameraEnabled, setCameraEnabled] = useState(false);
 
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [sessionActive, setSessionActive] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { start, stop, sessionActive, loading } = useFocusSession();
 
   // ======================
-  // START SESSION
+  // START
   // ======================
   const handleStart = async () => {
     if (!task) return alert("Add a task before starting");
 
     try {
-      setLoading(true);
-
-      const res = await startSessionRequest({
+      await start(
         task,
-        allowedSites: allowedSites
+        allowedSites
           ? allowedSites.split(",").map((s) => s.trim())
-          : [],
-      });
-
-      setSessionId(res.id);
-      setSessionActive(true);
-    } catch (err) {
-      console.error(err);
+          : []
+      );
+    } catch {
       alert("Error starting session");
-    } finally {
-      setLoading(false);
     }
   };
 
   // ======================
-  // STOP SESSION
+  // STOP
   // ======================
   const handleStop = async () => {
-    if (!sessionId) return;
-
     try {
-      setLoading(true);
+      const result = await stop();
 
-      const result = await stopSessionRequest(sessionId);
-
-      console.log("Session result:", result);
-
-      // aquí luego mostramos métricas en UI
-      alert(`Score: ${result.score}`);
-
-      setSessionActive(false);
-      setSessionId(null);
-    } catch (err) {
-      console.error(err);
+      alert(`Score: ${result?.score}`);
+    } catch {
       alert("Error stopping session");
-    } finally {
-      setLoading(false);
     }
   };
-
-  // ======================
-  // EVENT LOOP (MVP)
-  // ======================
-  useEffect(() => {
-    if (!sessionActive || !sessionId) return;
-
-    const interval = setInterval(() => {
-      sendEventRequest({
-        sessionId,
-        type: "ACTIVE",
-      });
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [sessionActive, sessionId]);
 
   return (
     <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
@@ -125,7 +82,7 @@ export default function FocusPage() {
           />
         </div>
 
-        {/* CONTEXT (OPCIONAL) */}
+        {/* CONTEXT */}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm text-gray-500 flex items-center gap-2">
             <Globe size={14} />

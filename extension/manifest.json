@@ -1,0 +1,19 @@
+{
+    "manifest_version": 3,
+    "name": "Focus Tracker Extension",
+    "version": "1.0",
+    "permissions": ["tabs", "activeTab"],
+    "host_permissions": [
+      "http://localhost:3000/*",
+      "http://localhost:3001/*"
+    ],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+      {
+        "matches": ["http://localhost:3000/*"],
+        "js": ["content.js"]
+      }
+    ]
+  }

@@ -1,17 +1,19 @@
 //frontend\modules\focus\hooks\useFocusSession.ts
-"use client";
+'use client';
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from 'react';
 import {
   startSessionRequest,
   stopSessionRequest,
   sendEventRequest,
-} from "@/services/session/session.service";
+} from '@/services/session/session.service';
+
+import { getExtensionTokenRequest } from '@/services/auth/auth.service';
 
 import {
   saveSessionId,
   clearSessionId,
-} from "@/services/utils/session-storage";
+} from '@/services/utils/session-storage';
 
 export function useFocusSession() {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -31,23 +33,27 @@ export function useFocusSession() {
       setLoading(true);
 
       const res = await startSessionRequest({ task, allowedSites });
+      const extension = await getExtensionTokenRequest();
 
       setSessionId(res.id);
-      sessionIdRef.current = res.id; 
+      sessionIdRef.current = res.id;
 
       setSessionActive(true);
 
       saveSessionId(res.id);
 
-      window.postMessage({
-        type: "FOCUS_SESSION",
-        sessionId: res.id,
-      }, "*");
+      window.postMessage(
+        {
+          type: 'FOCUS_SESSION',
+          sessionId: res.id,
+          token: extension.token,
+        },
+        '*'
+      );
 
       // reset estado
       lastActivityRef.current = Date.now();
       isIdleRef.current = false;
-
     } catch (err) {
       console.error(err);
       throw err;
@@ -67,22 +73,24 @@ export function useFocusSession() {
       setLoading(true);
 
       const result = await stopSessionRequest(id);
-      console.log("SESSION RESULT:", result);
+      console.log('SESSION RESULT:', result);
 
       clearSessionId();
 
       setSessionId(null);
-      sessionIdRef.current = null; 
+      sessionIdRef.current = null;
 
       setSessionActive(false);
-      
-      window.postMessage({
-        type: "FOCUS_SESSION",
-        sessionId: null,
-      }, "*");
+
+      window.postMessage(
+        {
+          type: 'FOCUS_SESSION',
+          sessionId: null,
+        },
+        '*'
+      );
 
       return result;
-
     } catch (err) {
       console.error(err);
       throw err;
@@ -104,7 +112,8 @@ export function useFocusSession() {
       if (!isIdleRef.current) {
         sendEventRequest({
           sessionId: id,
-          type: "ACTIVE",
+          type: 'ACTIVE',
+          timestamp: Date.now(),
         });
       }
     }, 5000);
@@ -129,16 +138,15 @@ export function useFocusSession() {
 
         sendEventRequest({
           sessionId: id,
-          type: "ACTIVE",
+          type: 'ACTIVE',
+          timestamp: Date.now(),
         });
       }
     };
 
-    const events = ["mousemove", "keydown", "click"];
+    const events = ['mousemove', 'keydown', 'click'];
 
-    events.forEach((e) =>
-      window.addEventListener(e, markActivity)
-    );
+    events.forEach((e) => window.addEventListener(e, markActivity));
 
     const interval = setInterval(() => {
       const id = sessionIdRef.current;
@@ -152,15 +160,14 @@ export function useFocusSession() {
 
         sendEventRequest({
           sessionId: id,
-          type: "IDLE",
+          type: 'IDLE',
+          timestamp: Date.now(),
         });
       }
     }, 3000);
 
     return () => {
-      events.forEach((e) =>
-        window.removeEventListener(e, markActivity)
-      );
+      events.forEach((e) => window.removeEventListener(e, markActivity));
       clearInterval(interval);
     };
   }, [sessionActive]);

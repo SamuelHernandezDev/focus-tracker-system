@@ -1,4 +1,5 @@
 //backend\src\auth\auth.service.ts
+
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { mockUsers } from '../users/data/mock-users';
@@ -48,6 +49,23 @@ export class AuthService {
     return {
       user,
     };
+  }
+
+  // ======================
+  // EXTENSION TOKEN
+  // ======================
+
+  generateExtensionToken(userId: string, email: string) {
+    return this.jwtService.sign(
+      {
+        sub: userId,
+        email,
+        type: 'extension',
+      },
+      {
+        expiresIn: '7d',
+      },
+    );
   }
 
   async getMe(req: Request) {

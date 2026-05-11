@@ -1,0 +1,130 @@
+//backend/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ======================
+// SESSION
+// ======================
+
+model Session {
+  id String @id @default(uuid())
+
+  userId String
+
+  task String
+
+  allowedSites String[]
+
+  startTime DateTime @default(now())
+
+  endTime DateTime?
+
+  // ======================
+  // METRICS
+  // ======================
+
+  focusTime Float?
+
+  idleTime Float?
+
+  interruptions Int?
+
+  distractions Int?
+
+  score Int?
+
+  // ======================
+  // AI
+  // ======================
+
+  feedback String?
+
+  createdAt DateTime @default(now())
+
+  // ======================
+  // RELATIONS
+  // ======================
+
+  events Event[]
+
+  domains SessionDomain[]
+}
+
+// ======================
+// EVENT
+// ======================
+
+model Event {
+  id String @id @default(uuid())
+
+  sessionId String
+
+  type EventType
+
+  value String?
+
+  timestamp Float
+
+  createdAt DateTime @default(now())
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+}
+
+// ======================
+// SESSION DOMAIN
+// ======================
+
+model SessionDomain {
+  id String @id @default(uuid())
+
+  sessionId String
+
+  domain String
+
+  // seconds
+  time Float
+
+  // ======================
+  // CLASSIFICATION
+  // ======================
+
+  category String
+
+  relevant Boolean
+
+  isDistraction Boolean
+
+  // ======================
+  // AI
+  // ======================
+
+  aiConfidence Float?
+
+  aiReason String?
+
+  createdAt DateTime @default(now())
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+}
+
+// ======================
+// EVENT TYPE
+// ======================
+
+enum EventType {
+  ACTIVE
+  IDLE
+  TAB_CHANGE
+}

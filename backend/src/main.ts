@@ -11,7 +11,7 @@ async function bootstrap() {
   // COOKIES
   app.use(cookieParser());
 
-  // VALIDATION 
+  // VALIDATION
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -22,17 +22,14 @@ async function bootstrap() {
 
   // CORS
   app.enableCors({
-    origin: [
-      "http://localhost:3000",
-      "http://192.168.100.3:3000",
-    ],
+    origin: ['http://localhost:3000', 'http://192.168.100.3:3000'],
     credentials: true,
   });
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') || 3001;
 
-  await app.listen(port, "0.0.0.0");
+  await app.listen(port, '0.0.0.0');
 
   console.log(`Server running on http://localhost:${port}`);
 }

@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 
 import { AuthModule } from './auth/auth.module';
 import { SessionsModule } from './sessions/sessions.module';
+import { AttentionModule } from './attention/attention.module';
 
 import { AiModule } from './ai/ai.module';
 
@@ -20,6 +21,7 @@ import { AiModule } from './ai/ai.module';
     AuthModule,
     SessionsModule,
     AiModule,
+    AttentionModule,
   ],
 
   controllers: [AppController],

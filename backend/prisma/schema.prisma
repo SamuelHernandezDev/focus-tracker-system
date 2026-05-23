@@ -42,6 +42,20 @@ model Session {
   score Int?
 
   // ======================
+  // ATTENTION METRICS
+  // ======================
+
+  attentiveTime Float?
+
+  distractedTime Float?
+
+  phoneTime Float?
+
+  absentTime Float?
+
+  attentionScore Float?
+
+  // ======================
   // AI
   // ======================
 
@@ -56,6 +70,8 @@ model Session {
   events Event[]
 
   domains SessionDomain[]
+
+  attentionSegments AttentionSegment[]
 }
 
 // ======================
@@ -78,6 +94,41 @@ model Event {
   session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId])
+}
+
+// ======================
+// ATTENTION SEGMENT
+// ======================
+
+model AttentionSegment {
+  id String @id @default(uuid())
+
+  sessionId String
+
+  state AttentionState
+
+  startedAt DateTime
+
+  endedAt DateTime
+
+  // milliseconds
+  duration Int
+
+  confidence Float?
+
+  createdAt DateTime @default(now())
+
+  // ======================
+  // RELATION
+  // ======================
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+
+  @@index([state])
+
+  @@index([startedAt])
 }
 
 // ======================
@@ -125,6 +176,22 @@ model SessionDomain {
 
 enum EventType {
   ACTIVE
+
   IDLE
+
   TAB_CHANGE
+}
+
+// ======================
+// ATTENTION STATE
+// ======================
+
+enum AttentionState {
+  ATTENTIVE
+
+  DISTRACTED
+
+  PHONE
+
+  ABSENT
 }

@@ -1,8 +1,8 @@
 //frontend\modules\sessions\components\hooks\useSessions.ts
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { getSessionsRequest } from "@/services/session/session.service";
+import { useEffect, useState } from 'react';
+import { getSessionsRequest } from '@/services/session/session.service';
 
 export function useSessions() {
   const [sessions, setSessions] = useState<any[]>([]);
@@ -11,33 +11,34 @@ export function useSessions() {
   const fetchSessions = async () => {
     try {
       const data = await getSessionsRequest();
+      console.log('RAW SESSIONS:', data);
 
       const mapped = data.map((s: any) => {
         const start = new Date(s.startTime);
         const end = s.endTime ? new Date(s.endTime) : null;
-      
+
         const duration = end
           ? Math.round((end.getTime() - start.getTime()) / 60000)
           : 0;
-      
+
         return {
           id: s.id,
           date: s.startTime,
           duration,
           score: s.score ?? 0,
           interruptions: s.interruptions ?? 0,
-      
+
           focusTime: s.focusTime,
           idleTime: s.idleTime,
           distractions: s.distractions,
           task: s.task,
-    
+
           topDomains: s.topDomains ?? [],
         };
       });
 
       setSessions(mapped);
-
+      console.log('MAPPED SESSIONS:', mapped);
     } catch (err) {
       console.error(err);
     } finally {

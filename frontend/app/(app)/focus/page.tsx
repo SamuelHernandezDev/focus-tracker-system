@@ -1,7 +1,8 @@
 //frontend\app\(app)\focus\page.tsx
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
+
 import {
   Brain,
   Globe,
@@ -9,32 +10,45 @@ import {
   PlayCircle,
   StopCircle,
   Activity,
-} from "lucide-react";
+} from 'lucide-react';
 
-import { useFocusSession } from "@/modules/focus/hooks/useFocusSession";
+import { useFocusSession } from '@/modules/focus/hooks/useFocusSession';
+
+import CameraPreview from '@/modules/focus/components/CameraPreview';
 
 export default function FocusPage() {
-  const [task, setTask] = useState("");
-  const [allowedSites, setAllowedSites] = useState("");
+  const [task, setTask] = useState('');
+  const [allowedSites, setAllowedSites] = useState('');
+
   const [cameraEnabled, setCameraEnabled] = useState(false);
 
-  const { start, stop, sessionActive, loading } = useFocusSession();
+  const {
+    start,
+
+    stop,
+
+    sessionId,
+
+    sessionActive,
+
+    loading,
+  } = useFocusSession();
 
   // ======================
   // START
   // ======================
   const handleStart = async () => {
-    if (!task) return alert("Add a task before starting");
+    if (!task) {
+      return alert('Add a task before starting');
+    }
 
     try {
       await start(
         task,
-        allowedSites
-          ? allowedSites.split(",").map((s) => s.trim())
-          : []
+        allowedSites ? allowedSites.split(',').map((s) => s.trim()) : []
       );
     } catch {
-      alert("Error starting session");
+      alert('Error starting session');
     }
   };
 
@@ -47,18 +61,16 @@ export default function FocusPage() {
 
       alert(`Score: ${result?.score}`);
     } catch {
-      alert("Error stopping session");
+      alert('Error stopping session');
     }
   };
 
   return (
     <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
-
       {/* HEADER */}
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900">
-          Focus Session
-        </h1>
+        <h1 className="text-2xl font-semibold text-gray-900">Focus Session</h1>
+
         <p className="text-sm text-gray-500">
           Configure and start your focus tracking session
         </p>
@@ -66,7 +78,6 @@ export default function FocusPage() {
 
       {/* SETUP */}
       <div className="bg-white rounded-xl p-6 space-y-5 shadow-sm">
-
         {/* TASK */}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm text-gray-500 flex items-center gap-2">
@@ -96,7 +107,6 @@ export default function FocusPage() {
             className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-
       </div>
 
       {/* SENSORS */}
@@ -106,6 +116,7 @@ export default function FocusPage() {
             <Camera size={16} />
             Presence Detection
           </p>
+
           <p className="text-xs text-gray-400">
             Camera is used to detect attention (not recorded)
           </p>
@@ -113,15 +124,27 @@ export default function FocusPage() {
 
         <button
           onClick={() => setCameraEnabled((prev) => !prev)}
-          className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition
-            ${cameraEnabled
-              ? "bg-green-600 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
+          className={`
+            px-4 py-2 rounded-lg text-sm font-medium
+            flex items-center gap-2 transition
+
+            ${
+              cameraEnabled
+                ? 'bg-green-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }
+          `}
         >
           <Activity size={14} />
-          {cameraEnabled ? "Enabled" : "Enable"}
+
+          {cameraEnabled ? 'Enabled' : 'Enable'}
         </button>
       </div>
+
+      {/* ATTENTION MODULE */}
+      {cameraEnabled && (
+        <CameraPreview enabled={sessionActive} sessionId={sessionId} />
+      )}
 
       {/* STATUS */}
       {sessionActive && (
@@ -143,7 +166,16 @@ export default function FocusPage() {
           <button
             onClick={handleStart}
             disabled={loading}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:opacity-50"
+            className="
+              flex items-center gap-2
+              px-6 py-3
+              bg-blue-600 text-white
+              rounded-lg
+              hover:bg-blue-700
+              transition
+              font-medium
+              disabled:opacity-50
+            "
           >
             <PlayCircle size={18} />
             Start Session
@@ -152,14 +184,22 @@ export default function FocusPage() {
           <button
             onClick={handleStop}
             disabled={loading}
-            className="flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium disabled:opacity-50"
+            className="
+              flex items-center gap-2
+              px-6 py-3
+              bg-red-600 text-white
+              rounded-lg
+              hover:bg-red-700
+              transition
+              font-medium
+              disabled:opacity-50
+            "
           >
             <StopCircle size={18} />
             Stop Session
           </button>
         )}
       </div>
-
     </div>
   );
 }

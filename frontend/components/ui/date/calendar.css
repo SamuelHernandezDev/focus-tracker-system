@@ -1,0 +1,67 @@
+.rdp-custom {
+    font-size: 14px;
+  }
+  
+  .rdp-custom .rdp-head_cell {
+    color: #9ca3af;
+    font-size: 12px;
+    font-weight: 400;
+  }
+  
+  .rdp-custom .rdp-day_range_middle {
+    background: transparent !important;
+  }
+  
+  .rdp-custom .rdp-day_button {
+    border-radius: 8px;
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    padding: 6px;
+  
+    font-size: 14px;
+    font-weight: 400;
+  }
+  
+  .rdp-custom .rdp-day_button:hover {
+    background: #f3f4f6;
+  }
+  
+  .rdp-custom .rdp-day_today .rdp-day_button {
+    border: 1px solid #d1d5db;
+  }
+  
+  .rdp-custom .rdp-day_selected .rdp-day_button,
+  .rdp-custom .rdp-day_range_start .rdp-day_button,
+  .rdp-custom .rdp-day_range_end .rdp-day_button {
+    background: #111827;
+    color: white;
+  
+    font-size: 14px;
+    font-weight: 400;
+  }
+  
+  .rdp-custom .rdp-day_range_middle .rdp-day_button {
+    background: #f3f4f6;
+    color: #111827;
+  
+    font-size: 14px;
+    font-weight: 400;
+  }
+  
+  .rdp-custom .rdp-day_outside {
+    color: #d1d5db;
+  }
+  
+  .rdp-custom .rdp-button_previous,
+  .rdp-custom .rdp-button_next {
+    border-radius: 6px;
+    padding: 4px;
+  }
+  
+  .rdp-custom .rdp-button_previous:hover,
+  .rdp-custom .rdp-button_next:hover {
+    background: #f3f4f6;
+  }

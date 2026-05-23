@@ -6,6 +6,7 @@ import { useState } from 'react';
 
 import { FileText, Brain, BarChart3, Activity, Expand } from 'lucide-react';
 
+import { useSessionDetails } from '../hooks/useSessionDetails';
 import { SessionDetailsModal } from './SessionDetailsModal';
 
 type Session = {
@@ -45,6 +46,16 @@ type Props = {
 export function SessionExpanded({ item }: Props) {
   const [open, setOpen] = useState(false);
 
+  const { session, loading } = useSessionDetails(item.id);
+
+  if (loading || !session) {
+    return (
+      <div className="py-6 text-sm text-gray-400">
+        Loading session preview...
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="space-y-6">
@@ -69,7 +80,7 @@ export function SessionExpanded({ item }: Props) {
               leading-relaxed
             "
           >
-            {item.task || 'No task provided'}
+            {session.task || 'No task provided'}
           </p>
         </div>
 
@@ -204,14 +215,14 @@ export function SessionExpanded({ item }: Props) {
             Top Activity
           </div>
 
-          {item.topDomains && item.topDomains.length > 0 ? (
+          {session.domains && session.domains.length > 0 ? (
             <div
               className="
                 grid grid-cols-2
                 gap-2
               "
             >
-              {item.topDomains.map((d, index) => (
+              {session.domains.slice(0, 4).map((d, index) => (
                 <div
                   key={index}
                   className="
@@ -327,7 +338,7 @@ export function SessionExpanded({ item }: Props) {
               leading-relaxed
             "
           >
-            {item.feedback ||
+            {session.feedback ||
               'You maintained a stable focus, but distractions impacted your performance. Try reducing time spent on non-essential tabs.'}
           </p>
         </div>

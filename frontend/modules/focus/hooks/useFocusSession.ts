@@ -72,15 +72,37 @@ export function useFocusSession() {
     try {
       setLoading(true);
 
-      const result = await stopSessionRequest(id);
-      console.log('SESSION RESULT:', result);
+      // ======================
+      // IMMEDIATE FRONTEND STOP
+      // ======================
+      setSessionActive(false);
+
+      setSessionId(null);
+
+      sessionIdRef.current = null;
 
       clearSessionId();
 
-      setSessionId(null);
-      sessionIdRef.current = null;
+      // ======================
+      // NOTIFY EXTENSION
+      // ======================
+      window.postMessage(
+        {
+          type: 'FOCUS_SESSION',
 
-      setSessionActive(false);
+          sessionId: null,
+        },
+        '*'
+      );
+
+      // ======================
+      // STOP BACKEND SESSION
+      // ======================
+      const result = await stopSessionRequest(id);
+
+      console.log('SESSION RESULT:', result);
+
+      return result;
 
       window.postMessage(
         {

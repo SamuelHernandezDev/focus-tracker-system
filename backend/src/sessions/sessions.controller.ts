@@ -61,7 +61,8 @@ export class SessionsController {
   @Get()
   getSessions(@Req() req: RequestWithUser) {
     const userId = req.user.id;
-
+    console.log('AUTH USER:', req.user);
+    console.log('USER ID:', req.user.id);
     return this.sessionsService.getSessionsByUser(userId);
   }
 

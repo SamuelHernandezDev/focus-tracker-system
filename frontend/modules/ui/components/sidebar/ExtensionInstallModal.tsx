@@ -756,8 +756,39 @@ export default function ExtensionInstallModal({ open, onClose }: Props) {
                   transition-all
                 "
               >
-                <Download size={16} />
-                Download ZIP
+                <a
+                  href="/downloads/focus-tracker-companion-v1.zip"
+                  download
+                  className="
+    h-12
+
+    px-6
+
+    rounded-2xl
+
+    bg-gradient-to-r
+    from-indigo-500
+    to-violet-500
+
+    flex items-center
+    gap-2
+
+    text-sm
+    font-medium
+
+    text-white
+
+    shadow-xl
+    shadow-indigo-500/20
+
+    hover:scale-[1.02]
+
+    transition-all
+  "
+                >
+                  <Download size={16} />
+                  Download ZIP
+                </a>
               </button>
             </div>
           </div>

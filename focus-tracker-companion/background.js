@@ -234,35 +234,38 @@ async function flushCurrentContext() {
   }
 
   try {
-    const res = await fetch('http://localhost:3001/sessions/event', {
-      method: 'POST',
+    const res = await fetch(
+      'https://focus-tracker-system-production.up.railway.app/sessions/event',
+      {
+        method: 'POST',
 
-      headers: {
-        'Content-Type': 'application/json',
+        headers: {
+          'Content-Type': 'application/json',
 
-        Authorization: `Bearer ${currentToken}`,
-      },
+          Authorization: `Bearer ${currentToken}`,
+        },
 
-      body: JSON.stringify({
-        sessionId: currentSessionId,
+        body: JSON.stringify({
+          sessionId: currentSessionId,
 
-        type: 'TRACKING_ACTIVITY',
+          type: 'TRACKING_ACTIVITY',
 
-        value: JSON.stringify({
-          domain: currentDomain,
+          value: JSON.stringify({
+            domain: currentDomain,
 
-          duration,
+            duration,
 
-          keyboard: trackingBucket.keyboard,
+            keyboard: trackingBucket.keyboard,
 
-          mouse: trackingBucket.mouse,
+            mouse: trackingBucket.mouse,
 
-          clicks: trackingBucket.clicks,
+            clicks: trackingBucket.clicks,
+          }),
+
+          timestamp: Date.now(),
         }),
-
-        timestamp: Date.now(),
-      }),
-    });
+      }
+    );
 
     console.log(
       'DOMAIN_ACTIVITY:',

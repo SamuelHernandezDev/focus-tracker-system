@@ -757,7 +757,7 @@ export default function ExtensionInstallModal({ open, onClose }: Props) {
                 "
               >
                 <a
-                  href="/downloads/focus-tracker-companion-v1.zip"
+                  href="/downloads/focus-tracker-companion.zip"
                   download
                   className="
     h-12

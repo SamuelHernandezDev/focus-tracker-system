@@ -1,8 +1,8 @@
 //frontend\modules\ui\components\sidebar\sidebarItem.tsx
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useState, useEffect } from "react";
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
 
 export default function SidebarItem({
   href,
@@ -10,7 +10,7 @@ export default function SidebarItem({
   icon: Icon,
   isActive,
   collapsed,
-  onClick, 
+  onClick,
 }: any) {
   const [hideText, setHideText] = useState(collapsed);
 
@@ -24,17 +24,17 @@ export default function SidebarItem({
   }, [collapsed]);
 
   const baseClass = `
-  w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm
+  w-full flex items-center gap-3 px-3 py-2 rounded-3xl text-sm
   transition-all duration-200
-  ${collapsed ? "justify-center" : ""}
+  ${collapsed ? 'justify-center' : ''}
 
   ${
     isActive
-      ? "bg-blue-600 text-white shadow-sm"
-      : "text-gray-400 hover:bg-gray-800/60 hover:text-gray-200"
+      ? 'bg-blue-600 text-white shadow-sm'
+      : 'text-gray-400 hover:bg-gray-800/60 hover:text-gray-200'
   }
 
-  ${onClick && "opacity-60 cursor-not-allowed"}
+  ${onClick && 'opacity-60 cursor-not-allowed'}
 `;
 
   const content = (
@@ -42,9 +42,7 @@ export default function SidebarItem({
       <Icon size={18} />
 
       {!hideText && (
-        <span className="whitespace-nowrap animate-popIn">
-          {label}
-        </span>
+        <span className="whitespace-nowrap animate-popIn">{label}</span>
       )}
     </>
   );
@@ -53,7 +51,7 @@ export default function SidebarItem({
     return (
       <button
         onClick={onClick}
-        title={collapsed ? label : ""}
+        title={collapsed ? label : ''}
         className={baseClass}
       >
         {content}
@@ -62,11 +60,7 @@ export default function SidebarItem({
   }
 
   return (
-    <Link
-      href={href}
-      title={collapsed ? label : ""}
-      className={baseClass}
-    >
+    <Link href={href} title={collapsed ? label : ''} className={baseClass}>
       {content}
     </Link>
   );

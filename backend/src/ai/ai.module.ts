@@ -2,11 +2,15 @@
 
 import { Module } from '@nestjs/common';
 
-import { AiService } from './ai.service';
+import { AiService } from './services/ai.service';
+
+import { AiDomainAnalysisService } from './services/ai-domain-analysis.service';
+
+import { AiBehaviorAnalysisService } from './services/ai-behavior-analysis.service';
 
 @Module({
-  providers: [AiService],
+  providers: [AiService, AiDomainAnalysisService, AiBehaviorAnalysisService],
 
-  exports: [AiService],
+  exports: [AiService, AiDomainAnalysisService, AiBehaviorAnalysisService],
 })
 export class AiModule {}

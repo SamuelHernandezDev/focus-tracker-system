@@ -1,26 +1,57 @@
-//frontend\app\(app)\focus\page.tsx
+//frontend/app/(app)/focus/page.tsx
+
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import {
-  Brain,
-  Globe,
-  Camera,
-  PlayCircle,
-  StopCircle,
-  Activity,
-} from 'lucide-react';
+import { Brain } from 'lucide-react';
 
 import { useFocusSession } from '@/modules/focus/hooks/useFocusSession';
 
 import CameraPreview from '@/modules/focus/components/CameraPreview';
 
+import { PageHeader } from '@/components/ui/PageHeader';
+
+import { FocusSetupSection } from '@/modules/focus/components/focusSetup/FocusSetupSection';
+
+import { FocusSensorsSection } from '@/modules/focus/components/focusSetup/FocusSensorsSection';
+
+import { FocusStatusSection } from '@/modules/focus/components/focusSetup/FocusStatusSection';
+
+import { FocusControlsSection } from '@/modules/focus/components/focusSetup/FocusControlsSection';
+
 export default function FocusPage() {
+  // ======================
+  // LOCAL STATE
+  // ======================
+
   const [task, setTask] = useState('');
-  const [allowedSites, setAllowedSites] = useState('');
+
+  const [allowedSites, setAllowedSites] = useState<string[]>([]);
 
   const [cameraEnabled, setCameraEnabled] = useState(false);
+
+  const [attemptedStart, setAttemptedStart] = useState(false);
+
+  useEffect(() => {
+    if (!attemptedStart) return;
+
+    const timeout = setTimeout(() => {
+      setAttemptedStart(false);
+    }, 3500);
+
+    return () => clearTimeout(timeout);
+  }, [attemptedStart]);
+
+  useEffect(() => {
+    if (task.trim() && allowedSites.length > 0) {
+      setAttemptedStart(false);
+    }
+  }, [task, allowedSites]);
+
+  // ======================
+  // SESSION
+  // ======================
 
   const {
     start,
@@ -37,16 +68,16 @@ export default function FocusPage() {
   // ======================
   // START
   // ======================
+
   const handleStart = async () => {
-    if (!task) {
-      return alert('Add a task before starting');
+    setAttemptedStart(true);
+
+    if (!task.trim() || allowedSites.length === 0) {
+      return;
     }
 
     try {
-      await start(
-        task,
-        allowedSites ? allowedSites.split(',').map((s) => s.trim()) : []
-      );
+      await start(task, allowedSites);
     } catch {
       alert('Error starting session');
     }
@@ -55,6 +86,7 @@ export default function FocusPage() {
   // ======================
   // STOP
   // ======================
+
   const handleStop = async () => {
     try {
       const result = await stop();
@@ -65,140 +97,119 @@ export default function FocusPage() {
     }
   };
 
+  const missingTask = !task.trim();
+
+  const missingSites = allowedSites.length === 0;
+
+  const canStart = !missingTask && !missingSites;
+
   return (
-    <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
-      {/* HEADER */}
-      <div>
-        <h1 className="text-2xl font-semibold text-gray-900">Focus Session</h1>
+    <div
+      className="
+      h-[calc(94vh-64px)]
 
-        <p className="text-sm text-gray-500">
-          Configure and start your focus tracking session
-        </p>
+      flex flex-col
+
+      bg-gray-50
+
+      overflow-hidden
+    "
+    >
+      {/* PAGE HEADER */}
+
+      <div
+        className="
+        px-8
+        pt-6
+        pb-3
+
+        shrink-0
+      "
+      >
+        <PageHeader
+          icon={Brain}
+          title="Focus Tracker"
+          description="Configure and start your AI-powered focus tracking session"
+        />
       </div>
 
-      {/* SETUP */}
-      <div className="bg-white rounded-xl p-6 space-y-5 shadow-sm">
-        {/* TASK */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-gray-500 flex items-center gap-2">
-            <Brain size={14} />
-            Task
-          </label>
+      {/* CONTENT */}
 
-          <input
-            value={task}
-            onChange={(e) => setTask(e.target.value)}
-            placeholder="What are you working on?"
-            className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+      <div
+        className="
+        flex-1
 
-        {/* CONTEXT */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-gray-500 flex items-center gap-2">
-            <Globe size={14} />
-            Allowed Sites (optional)
-          </label>
+        px-8
+        pb-6
 
-          <input
-            value={allowedSites}
-            onChange={(e) => setAllowedSites(e.target.value)}
-            placeholder="Optional: limit distractions (future feature)"
-            className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-      </div>
+        min-h-0
+      "
+      >
+        {/* GRID */}
 
-      {/* SENSORS */}
-      <div className="bg-white rounded-xl p-6 shadow-sm flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-700 flex items-center gap-2">
-            <Camera size={16} />
-            Presence Detection
-          </p>
+        <div
+          className="
+          h-full
 
-          <p className="text-xs text-gray-400">
-            Camera is used to detect attention (not recorded)
-          </p>
-        </div>
+          grid
 
-        <button
-          onClick={() => setCameraEnabled((prev) => !prev)}
-          className={`
-            px-4 py-2 rounded-lg text-sm font-medium
-            flex items-center gap-2 transition
+          xl:grid-cols-[1.05fr_0.95fr]
 
-            ${
-              cameraEnabled
-                ? 'bg-green-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }
-          `}
+          gap-4
+        "
         >
-          <Activity size={14} />
+          {/* LEFT COLUMN */}
 
-          {cameraEnabled ? 'Enabled' : 'Enable'}
-        </button>
-      </div>
+          <div
+            className="
+            flex flex-col
 
-      {/* ATTENTION MODULE */}
-      {cameraEnabled && (
-        <CameraPreview enabled={sessionActive} sessionId={sessionId} />
-      )}
+            gap-4
 
-      {/* STATUS */}
-      {sessionActive && (
-        <div className="bg-white rounded-xl border p-6 shadow-sm flex items-center justify-between">
-          <div className="flex items-center gap-2 text-green-600 font-medium">
-            <Activity size={16} />
-            Session Active
+            min-h-0
+          "
+          >
+            <FocusSetupSection
+              task={task}
+              allowedSites={allowedSites}
+              onTaskChange={setTask}
+              onAllowedSitesChange={setAllowedSites}
+              invalidTask={attemptedStart && !task.trim()}
+              invalidSites={attemptedStart && allowedSites.length === 0}
+            />
+
+            <FocusSensorsSection
+              cameraEnabled={cameraEnabled}
+              onToggleCamera={() => setCameraEnabled((prev) => !prev)}
+            />
+
+            <FocusStatusSection
+              sessionActive={sessionActive}
+              sessionId={sessionId}
+            />
+
+            <FocusControlsSection
+              sessionActive={sessionActive}
+              loading={loading}
+              onStart={handleStart}
+              onStop={handleStop}
+            />
           </div>
 
-          <span className="text-sm text-gray-500">
-            Tracking your focus in real time...
-          </span>
-        </div>
-      )}
+          {/* RIGHT COLUMN */}
 
-      {/* CONTROLS */}
-      <div className="flex gap-3">
-        {!sessionActive ? (
-          <button
-            onClick={handleStart}
-            disabled={loading}
+          <div
             className="
-              flex items-center gap-2
-              px-6 py-3
-              bg-blue-600 text-white
-              rounded-lg
-              hover:bg-blue-700
-              transition
-              font-medium
-              disabled:opacity-50
-            "
+            min-h-0
+          "
           >
-            <PlayCircle size={18} />
-            Start Session
-          </button>
-        ) : (
-          <button
-            onClick={handleStop}
-            disabled={loading}
-            className="
-              flex items-center gap-2
-              px-6 py-3
-              bg-red-600 text-white
-              rounded-lg
-              hover:bg-red-700
-              transition
-              font-medium
-              disabled:opacity-50
-            "
-          >
-            <StopCircle size={18} />
-            Stop Session
-          </button>
-        )}
+            <CameraPreview
+              enabled={sessionActive}
+              sessionId={sessionId}
+              cameraEnabled={cameraEnabled}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

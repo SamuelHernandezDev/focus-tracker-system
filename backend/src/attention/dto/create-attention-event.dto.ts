@@ -1,7 +1,7 @@
 //backend\src\attention\dto\create-attention-event.dto.ts
 import { IsEnum, IsInt, IsUUID } from 'class-validator';
 
-import { AttentionState } from '../types/attention-state.enum';
+import { AttentionState } from '../enums/attention-state.enum';
 
 export class CreateAttentionEventDto {
   @IsUUID()

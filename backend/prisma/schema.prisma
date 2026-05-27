@@ -28,7 +28,7 @@ model Session {
   endTime DateTime?
 
   // ======================
-  // METRICS
+  // SESSION METRICS
   // ======================
 
   focusTime Float?
@@ -56,10 +56,30 @@ model Session {
   attentionScore Float?
 
   // ======================
+  // TRACKING METRICS
+  // ======================
+
+  keyboardEvents Int?
+
+  mouseEvents Int?
+
+  totalClicks Int?
+
+  totalInteractions Int?
+
+  totalInteractionTime Float?
+
+  activeDomainsCount Int?
+
+  averageInteractionRate Float?
+
+  // ======================
   // AI
   // ======================
 
   feedback String?
+
+  summary String?
 
   createdAt DateTime @default(now())
 
@@ -91,9 +111,13 @@ model Event {
 
   createdAt DateTime @default(now())
 
-  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+ session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId])
+
+  @@index([type])
+
+  @@index([timestamp])
 }
 
 // ======================
@@ -118,11 +142,7 @@ model AttentionSegment {
 
   createdAt DateTime @default(now())
 
-  // ======================
-  // RELATION
-  // ======================
-
-  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+ session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId])
 
@@ -149,7 +169,7 @@ model SessionDomain {
   // CLASSIFICATION
   // ======================
 
-  category String
+  category DomainCategory
 
   relevant Boolean
 
@@ -165,9 +185,13 @@ model SessionDomain {
 
   createdAt DateTime @default(now())
 
-  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+ session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId])
+
+  @@index([domain])
+
+  @@index([category])
 }
 
 // ======================
@@ -180,6 +204,8 @@ enum EventType {
   IDLE
 
   TAB_CHANGE
+
+  TRACKING_ACTIVITY
 }
 
 // ======================
@@ -194,4 +220,22 @@ enum AttentionState {
   PHONE
 
   ABSENT
+}
+
+// ======================
+// DOMAIN CATEGORY
+// ======================
+
+enum DomainCategory {
+  PRODUCTIVE
+
+  SUPPORT
+
+  LEARNING
+
+  NEUTRAL
+
+  SOCIAL
+
+  DISTRACTION
 }

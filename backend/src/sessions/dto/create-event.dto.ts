@@ -1,4 +1,5 @@
-//backend\src\sessions\dto\create-event.dto.ts
+//backend/src/sessions/dto/create-event.dto.ts
+
 import {
   IsEnum,
   IsOptional,
@@ -7,18 +8,14 @@ import {
   IsNumber,
 } from 'class-validator';
 
-export enum EventTypeEnum {
-  ACTIVE = 'ACTIVE',
-  IDLE = 'IDLE',
-  TAB_CHANGE = 'TAB_CHANGE',
-}
+import { EventType } from '@prisma/client';
 
 export class CreateEventDto {
   @IsUUID()
   sessionId: string;
 
-  @IsEnum(EventTypeEnum)
-  type: EventTypeEnum;
+  @IsEnum(EventType)
+  type: EventType;
 
   @IsOptional()
   @IsString()

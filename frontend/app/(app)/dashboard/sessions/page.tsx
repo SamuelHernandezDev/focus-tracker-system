@@ -1,5 +1,6 @@
 //frontend\app\(app)\dashboard\sessions\page.tsx
 'use client';
+import { Rows3 } from 'lucide-react';
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
 
@@ -30,6 +31,20 @@ export default function SessionsPage() {
 
   const [page, setPage] = useState(1);
 
+  const [fromDate, setFromDate] = useState<string | null>(null);
+
+  const [toDate, setToDate] = useState<string | null>(null);
+
+  const [sort, setSort] = useState<{
+    sortBy: 'date' | 'score';
+
+    sortOrder: 'asc' | 'desc';
+  }>({
+    sortBy: 'date',
+
+    sortOrder: 'desc',
+  });
+
   const PAGE_SIZE = 10;
 
   /* =======================
@@ -38,27 +53,91 @@ export default function SessionsPage() {
 
   useEffect(() => {
     setExpandedId(null);
-  }, [page]);
+  }, [page, fromDate, toDate, sort]);
 
   /* =======================
-     PAGINATION
-  ======================= */
+   FILTER + SORT
+======================= */
 
-  const paginatedData = useMemo(() => {
+  const filteredSessions = useMemo(() => {
     if (!sessions) return [];
 
+    let result = [...sessions];
+
+    // ======================
+    // DATE FILTER
+    // ======================
+
+    if (fromDate || toDate) {
+      result = result.filter((session) => {
+        const sessionDate = new Date(session.date);
+
+        const sessionDay = new Date(
+          sessionDate.getFullYear(),
+          sessionDate.getMonth(),
+          sessionDate.getDate()
+        );
+
+        const parseDate = (date: string) => {
+          const [y, m, d] = date.split('-').map(Number);
+
+          return new Date(y, m - 1, d);
+        };
+
+        const from = fromDate ? parseDate(fromDate) : null;
+
+        const to = toDate ? parseDate(toDate) : null;
+
+        if (from && sessionDay < from) {
+          return false;
+        }
+
+        if (to && sessionDay > to) {
+          return false;
+        }
+
+        return true;
+      });
+    }
+
+    // ======================
+    // SORT
+    // ======================
+
+    result.sort((a, b) => {
+      let comparison = 0;
+
+      if (sort.sortBy === 'date') {
+        comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
+      }
+
+      if (sort.sortBy === 'score') {
+        comparison = a.score - b.score;
+      }
+
+      return sort.sortOrder === 'asc' ? comparison : -comparison;
+    });
+
+    return result;
+  }, [sessions, fromDate, toDate, sort]);
+
+  /* =======================
+   PAGINATION
+======================= */
+
+  const paginatedData = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;
 
-    return sessions.slice(start, start + PAGE_SIZE);
-  }, [sessions, page]);
+    return filteredSessions.slice(start, start + PAGE_SIZE);
+  }, [filteredSessions, page]);
 
   const totalPages = useMemo(() => {
-    if (!sessions) return 0;
+    if (!filteredSessions) return 0;
 
-    return Math.ceil(sessions.length / PAGE_SIZE);
-  }, [sessions]);
+    return Math.ceil(filteredSessions.length / PAGE_SIZE);
+  }, [filteredSessions]);
 
-  const totalItems = sessions?.length ?? 0;
+  const totalItems = filteredSessions?.length ?? 0;
 
   /* =======================
      CALLBACKS
@@ -76,33 +155,54 @@ export default function SessionsPage() {
      EMPTY STATE
   ======================= */
 
-  const isEmpty = !loading && (!sessions || sessions.length === 0);
+  const isEmpty = !loading && filteredSessions.length === 0;
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-50 overflow-hidden">
+    <div
+      className="
+    h-[calc(90vh-64px)]
+
+    flex flex-col
+
+    bg-gray-50
+
+    overflow-hidden
+  "
+    >
       {/* PAGE HEADER */}
       <div className="p-8 pb-4 shrink-0">
         <PageHeader
-          title="Focus Sessions"
-          description="Browse and analyze AI-powered productivity sessions"
+          icon={Rows3}
+          title="Session History"
+          description="Browse and analyze previous productivity tracking sessions"
         >
           {/* FUTURE FILTERS */}
 
-          <DateRangePicker from={null} to={null} onChange={() => {}} />
+          <DateRangePicker
+            from={fromDate}
+            to={toDate}
+            onChange={(from, to) => {
+              setFromDate(from);
+
+              setToDate(to);
+
+              setPage(1);
+            }}
+          />
 
           <SortSelect
-            value={{
-              sortBy: 'date',
+            value={sort}
+            onChange={(val) => {
+              setSort(val);
 
-              sortOrder: 'desc',
+              setPage(1);
             }}
-            onChange={() => {}}
           />
         </PageHeader>
       </div>
 
       {/* CONTENT */}
-      <div className="flex-1 overflow-hidden px-8 pb-8 flex flex-col min-h-0">
+      <div className="flex-1 flex flex-col bg-gray-50 overflow-hidden">
         <AsyncContent
           data={sessions}
           isLoading={loading}

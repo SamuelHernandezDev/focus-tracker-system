@@ -2,19 +2,23 @@
 
 import { Module } from '@nestjs/common';
 
-import { AttentionController } from './attention.controller';
-
-import { AttentionGateway } from './attention.gateway';
-
-import { AttentionService } from './attention.service';
-
 import { PrismaModule } from '../prisma/prisma.module';
+
+import { AttentionController } from './controllers/attention.controller';
+
+import { AttentionGateway } from './gateway/attention.gateway';
+
+import { AttentionService } from './services/attention.service';
+
+import { AttentionAnalyticsService } from './services/attention-analytics.service';
 
 @Module({
   imports: [PrismaModule],
 
   controllers: [AttentionController],
 
-  providers: [AttentionGateway, AttentionService],
+  providers: [AttentionGateway, AttentionService, AttentionAnalyticsService],
+
+  exports: [AttentionService, AttentionAnalyticsService],
 })
 export class AttentionModule {}

@@ -1,8 +1,8 @@
 //frontend\modules\sessions\components\SessionRow.tsx
-"use client";
+'use client';
 
-import { ChevronRight } from "lucide-react";
-import { SessionExpanded } from "./SessionExpanded";
+import { ChevronRight } from 'lucide-react';
+import { SessionExpanded } from './SessionExpanded';
 
 type Session = {
   id: string;
@@ -24,8 +24,6 @@ type Session = {
   }[];
 };
 
-
-
 type Props = {
   item: Session;
   isExpanded: boolean;
@@ -33,22 +31,22 @@ type Props = {
 };
 
 function formatDate(dateString?: string) {
-  if (!dateString) return "—";
+  if (!dateString) return '—';
 
   const date = new Date(dateString);
 
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
   }).format(date);
 }
 
 function getScoreColor(score: number) {
-  if (score >= 80) return "bg-green-100 text-green-700";
-  if (score >= 60) return "bg-yellow-100 text-yellow-700";
-  return "bg-red-100 text-red-700";
+  if (score >= 80) return 'bg-green-100 text-green-700';
+  if (score >= 60) return 'bg-yellow-100 text-yellow-700';
+  return 'bg-red-100 text-red-700';
 }
 
 export function SessionRow({ item, isExpanded, onClick }: Props) {
@@ -67,7 +65,7 @@ export function SessionRow({ item, isExpanded, onClick }: Props) {
           grid grid-cols-[2.5fr_2fr_1.5fr_2fr]
           px-6 py-3 cursor-pointer
           items-center
-          ${isExpanded ? "bg-blue-50 rounded-t-xl" : "hover:bg-gray-50/70"}
+          ${isExpanded ? 'bg-blue-50 rounded-t-xl' : 'hover:bg-gray-50/70'}
         `}
       >
         {/* SESSION */}
@@ -76,7 +74,7 @@ export function SessionRow({ item, isExpanded, onClick }: Props) {
             size={16}
             className={`
               text-gray-400 transition-transform duration-300
-              ${isExpanded ? "rotate-90" : ""}
+              ${isExpanded ? 'rotate-90' : ''}
             `}
           />
 
@@ -87,9 +85,7 @@ export function SessionRow({ item, isExpanded, onClick }: Props) {
 
         {/* DURATION */}
         <div className="flex justify-center">
-          <span className="text-sm text-gray-700">
-            {item.duration} min
-          </span>
+          <span className="text-sm text-gray-700">{item.duration} min</span>
         </div>
 
         {/* SCORE */}
@@ -116,12 +112,41 @@ export function SessionRow({ item, isExpanded, onClick }: Props) {
       {/* EXPANDED */}
       <div
         className={`
-          overflow-hidden transition-all duration-300
-          ${isExpanded ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"}
-        `}
+    overflow-hidden
+
+    transition-all
+    duration-300
+
+    ${isExpanded ? 'max-h-[650px] opacity-100' : 'max-h-0 opacity-0'}
+  `}
       >
-        <div className="px-6 pb-5 pt-2 border-t border-gray-100">
-          <SessionExpanded item={item} />
+        <div
+          className="
+      px-6
+      pb-5
+      pt-2
+
+      border-t border-gray-100
+    "
+        >
+          {/* INTERNAL SCROLL */}
+
+          <div
+            className="
+        max-h-[560px]
+
+        overflow-y-auto
+
+        pr-2
+
+        scrollbar-thin
+        scrollbar-track-transparent
+        scrollbar-thumb-gray-200
+        hover:scrollbar-thumb-gray-300
+      "
+          >
+            <SessionExpanded item={item} />
+          </div>
         </div>
       </div>
     </div>

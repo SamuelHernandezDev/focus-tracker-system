@@ -1,9 +1,8 @@
-//frontend\modules\focus\components\CameraPreview.tsx
+//frontend/modules/focus/components/CameraPreview.tsx
+
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-
-import { Camera } from 'lucide-react';
 
 import { useCamera } from '../hooks/useCamera';
 
@@ -13,7 +12,7 @@ import { useAttentionStream } from '../hooks/useAttentionStream';
 
 import { AttentionState } from '../types/attention-state';
 
-import { getGazeDirection } from '../utils/gaze.utils';
+import { getGazeDirection, getEyesCenter } from '../utils/gaze.utils';
 
 import {
   resolveAttentionState,
@@ -22,42 +21,68 @@ import {
 
 import { compareGazeToCalibration } from '../utils/calibration.utils';
 
-import FaceLandmarksCanvas from './tracking/FaceLandmarksCanvas';
-
 import CalibrationModal from './CalibrationModal';
 
 import { CalibrationProfile } from '../types/calibration-profile';
 
-import { getEyesCenter } from '../utils/gaze.utils';
+import { CameraPreviewHeader } from './cameraPreview/CameraPreviewHeader';
+
+import { CameraPreviewVideo } from './cameraPreview/CameraPreviewVideo';
+
+import { CameraTrackingStats } from './cameraPreview/CameraTrackingStats';
+
+import { CameraDisabledOverlay } from './cameraPreview/CameraDisabledOverlay';
 
 type Props = {
   sessionId?: string | null;
 
   enabled: boolean;
+
+  cameraEnabled: boolean;
 };
 
 export default function CameraPreview({
   sessionId,
 
   enabled,
+
+  cameraEnabled,
 }: Props) {
   // =========================
   // VIDEO REF
   // =========================
+
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // =========================
+  // ATTENTION TRACKER
+  // =========================
 
   const attentionTrackerRef = useRef(createAttentionTracker());
 
+  // =========================
+  // CALIBRATION
+  // =========================
+
   const [calibrationProfile, setCalibrationProfile] =
     useState<CalibrationProfile | null>(null);
+
+  const [calibrationOpen, setCalibrationOpen] = useState(false);
+
+  // =========================
+  // ATTENTION
+  // =========================
 
   const [attentionState, setAttentionState] = useState(
     AttentionState.ATTENTIVE
   );
 
+  const [trackingActive, setTrackingActive] = useState(false);
+
   // =========================
   // CAMERA
   // =========================
+
   const {
     devices,
 
@@ -77,8 +102,25 @@ export default function CameraPreview({
   } = useCamera();
 
   // =========================
+  // TRACKING CONTROL
+  // =========================
+
+  const handleStartTracking = async () => {
+    await start();
+
+    setTrackingActive(true);
+  };
+
+  const handleStopTracking = () => {
+    stop();
+
+    setTrackingActive(false);
+  };
+
+  // =========================
   // FACE TRACKING
   // =========================
+
   const {
     loading: trackingLoading,
 
@@ -90,13 +132,16 @@ export default function CameraPreview({
   // =========================
   // GAZE
   // =========================
+
   const gazeDirection = (() => {
     if (!result?.landmarks || result.landmarks.length === 0) {
       return 'UNKNOWN';
     }
+
     // =========================
     // NOT CALIBRATED
     // =========================
+
     if (!calibrationProfile) {
       return getGazeDirection(result.landmarks);
     }
@@ -104,6 +149,7 @@ export default function CameraPreview({
     // =========================
     // CURRENT EYES CENTER
     // =========================
+
     const eyesCenter = getEyesCenter(result.landmarks);
 
     if (!eyesCenter) {
@@ -113,12 +159,17 @@ export default function CameraPreview({
     // =========================
     // CALIBRATED GAZE
     // =========================
+
     return compareGazeToCalibration(
       eyesCenter,
 
       calibrationProfile
     );
   })();
+
+  // =========================
+  // RAW ATTENTION
+  // =========================
 
   const rawAttentionState = resolveAttentionState(
     gazeDirection,
@@ -129,6 +180,7 @@ export default function CameraPreview({
   // =========================
   // TRACK ATTENTION STATE
   // =========================
+
   useEffect(() => {
     const interval = setInterval(() => {
       const confirmedState = attentionTrackerRef.current(rawAttentionState);
@@ -137,6 +189,7 @@ export default function CameraPreview({
         // =========================
         // NO CHANGE
         // =========================
+
         if (prev === confirmedState) {
           return prev;
         }
@@ -152,6 +205,10 @@ export default function CameraPreview({
     };
   }, [rawAttentionState]);
 
+  // =========================
+  // STREAM ATTENTION
+  // =========================
+
   useAttentionStream({
     enabled,
 
@@ -163,6 +220,7 @@ export default function CameraPreview({
   // =========================
   // ATTACH STREAM
   // =========================
+
   useEffect(() => {
     if (videoRef.current && stream) {
       videoRef.current.srcObject = stream;
@@ -170,137 +228,142 @@ export default function CameraPreview({
   }, [stream]);
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-5 space-y-4">
-      {/* HEADER */}
-      <div className="flex items-center gap-2">
-        <Camera size={16} />
+    <div
+      className="
+        relative
 
-        <h2 className="text-sm font-semibold text-gray-800">Camera Preview</h2>
-      </div>
+        overflow-hidden
 
-      {/* VIDEO */}
-      <div className="aspect-video rounded-xl overflow-hidden bg-black relative">
-        {/* VIDEO */}
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          className="w-full h-full object-cover"
+        rounded-[32px]
+
+        border border-white/40
+
+        bg-gradient-to-br
+        from-white
+        via-white
+        to-slate-50/80
+
+        p-4
+
+        shadow-sm
+
+        space-y-4
+      "
+    >
+      {/* GLOW */}
+
+      <div
+        className="
+          absolute
+          top-0 right-0
+
+          w-64 h-64
+
+          bg-violet-400/5
+
+          rounded-full
+
+          blur-3xl
+        "
+      />
+
+      {/* CONTENT */}
+
+      <div
+        className={`
+    relative z-10
+
+    space-y-4
+
+    transition-all
+    duration-500
+
+    ${
+      !cameraEnabled
+        ? `
+opacity-50
+
+scale-[0.985]
+
+blur-[0.5px]
+
+          pointer-events-none
+        `
+        : `
+          opacity-100
+        `
+    }
+  `}
+      >
+        {/* HEADER */}
+
+        <CameraPreviewHeader
+          devices={devices}
+          selectedDeviceId={selectedDeviceId}
+          onChangeDevice={setSelectedDeviceId}
+          onStart={handleStartTracking}
+          onStop={handleStopTracking}
+          loading={loading}
+          streaming={trackingActive}
         />
 
-        {/* LANDMARKS */}
-        {result?.detected && (
-          <FaceLandmarksCanvas
-            videoWidth={videoRef.current?.videoWidth || 1280}
-            videoHeight={videoRef.current?.videoHeight || 720}
+        {/* VIDEO */}
+
+        <CameraPreviewVideo
+          videoRef={videoRef}
+          detected={result?.detected || false}
+          landmarks={result?.landmarks || []}
+          calibrated={!!calibrationProfile}
+          trackingActive={trackingActive}
+          onOpenCalibration={() => setCalibrationOpen(true)}
+        />
+
+        {/* TRACKING STATS */}
+
+        <CameraTrackingStats
+          detected={result?.detected || false}
+          landmarksCount={result?.landmarks?.length || 0}
+          gazeDirection={gazeDirection}
+          attentionState={attentionState}
+          trackingLoading={trackingLoading}
+          trackingError={trackingError}
+        />
+
+        {/* CALIBRATION MODAL */}
+
+        {result?.landmarks && (
+          <CalibrationModal
+            open={calibrationOpen}
+            onClose={() => setCalibrationOpen(false)}
             landmarks={result.landmarks}
+            onComplete={setCalibrationProfile}
           />
         )}
-      </div>
 
-      {/* TRACKING STATUS */}
-      <div className="space-y-2">
-        {/* STATUS */}
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-gray-500">Face Tracking</p>
+        {/* CAMERA ERROR */}
 
+        {error && (
           <div
-            className={`
-              px-2 py-1 rounded-full
-              text-xs font-medium
+            className="
+              px-4 py-3
 
-              ${
-                result?.detected
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-red-100 text-red-700'
-              }
-            `}
+              rounded-2xl
+
+              bg-red-50
+              border border-red-100
+
+              text-sm
+              text-red-600
+            "
           >
-            {result?.detected ? 'FACE DETECTED' : 'NO FACE'}
+            {error}
           </div>
-        </div>
-
-        {/* LANDMARKS */}
-        <div className="text-xs text-gray-400">
-          Landmarks: {result?.landmarks.length || 0}
-        </div>
-
-        {/* GAZE */}
-        <div className="text-xs text-gray-400">
-          Gaze Direction:{' '}
-          <span className="font-medium text-blue-600">{gazeDirection}</span>
-        </div>
-
-        {/* ATTENTION */}
-        <div className="text-xs text-gray-400">
-          Attention State:{' '}
-          <span className="font-medium text-purple-600">{attentionState}</span>
-        </div>
-
-        {/* LOADING */}
-        {trackingLoading && (
-          <div className="text-xs text-blue-500">Initializing MediaPipe...</div>
-        )}
-
-        {/* TRACKING ERROR */}
-        {trackingError && (
-          <div className="text-xs text-red-500">{trackingError}</div>
         )}
       </div>
 
-      {/* CALIBRATION */}
-      {result?.landmarks && (
-        <CalibrationModal
-          landmarks={result.landmarks}
-          onComplete={setCalibrationProfile}
-        />
-      )}
+      {/* DISABLED OVERLAY */}
 
-      {/* DEVICE SELECT */}
-      <select
-        value={selectedDeviceId}
-        onChange={(e) => setSelectedDeviceId(e.target.value)}
-        className="
-          w-full border border-gray-200
-          rounded-lg px-3 py-2 text-sm
-        "
-      >
-        {devices.map((device) => (
-          <option key={device.deviceId} value={device.deviceId}>
-            {device.label}
-          </option>
-        ))}
-      </select>
-
-      {/* CONTROLS */}
-      <div className="flex gap-2">
-        <button
-          onClick={start}
-          disabled={loading}
-          className="
-            px-4 py-2 rounded-lg
-            bg-blue-600 text-white
-            text-sm
-          "
-        >
-          Start Camera
-        </button>
-
-        <button
-          onClick={stop}
-          className="
-            px-4 py-2 rounded-lg
-            bg-red-600 text-white
-            text-sm
-          "
-        >
-          Stop
-        </button>
-      </div>
-
-      {/* CAMERA ERROR */}
-      {error && <div className="text-sm text-red-500">{error}</div>}
+      <CameraDisabledOverlay disabled={!cameraEnabled} />
     </div>
   );
 }

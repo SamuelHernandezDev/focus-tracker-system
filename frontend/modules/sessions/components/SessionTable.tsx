@@ -81,7 +81,22 @@ export function SessionsTable({
   }, [page]);
 
   return (
-    <div className="bg-gray-50 rounded-2xl p-6 flex flex-col h-full min-h-0">
+    <div
+      className="
+    bg-gray-50
+
+    rounded-2xl
+
+    p-6
+
+    flex flex-col
+
+    h-full
+    min-h-0
+
+    overflow-hidden
+  "
+    >
       {/* HEADER */}
       <div className="sticky top-0 z-10 bg-gray-50 pb-3">
         <div
@@ -121,7 +136,21 @@ export function SessionsTable({
       {/* SCROLL */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto space-y-3 pr-2 min-h-0"
+        className="
+  flex-1
+  min-h-0
+
+  overflow-y-auto
+
+  space-y-3
+
+  pr-2
+
+  scrollbar-thin
+  scrollbar-track-transparent
+  scrollbar-thumb-gray-200
+  hover:scrollbar-thumb-gray-300
+"
       >
         {data.length === 0 ? (
           <div className="text-center text-gray-400 py-10">

@@ -43,7 +43,7 @@ export type SessionEvent = {
 
   sessionId: string;
 
-  type: 'ACTIVE' | 'IDLE' | 'TAB_CHANGE';
+  type: 'ACTIVE' | 'IDLE' | 'TAB_CHANGE' | 'TRACKING_ACTIVITY';
 
   value?: string | null;
 
@@ -53,6 +53,10 @@ export type SessionEvent = {
 };
 
 export type SessionDetails = {
+  // ======================
+  // BASE
+  // ======================
+
   id: string;
 
   userId: string;
@@ -65,6 +69,12 @@ export type SessionDetails = {
 
   endTime?: string | null;
 
+  createdAt: string;
+
+  // ======================
+  // PRODUCTIVITY
+  // ======================
+
   focusTime?: number | null;
 
   idleTime?: number | null;
@@ -75,9 +85,57 @@ export type SessionDetails = {
 
   score?: number | null;
 
+  // ======================
+  // ATTENTION
+  // ======================
+
+  attentiveTime?: number | null;
+
+  distractedTime?: number | null;
+
+  phoneTime?: number | null;
+
+  absentTime?: number | null;
+
+  attentionScore?: number | null;
+
+  // ======================
+  // TRACKING
+  // ======================
+
+  keyboardEvents?: number | null;
+
+  mouseEvents?: number | null;
+
+  totalClicks?: number | null;
+
+  totalInteractions?: number | null;
+
+  totalInteractionTime?: number | null;
+
+  activeDomainsCount?: number | null;
+
+  averageInteractionRate?: number | null;
+
+  // ======================
+  // AI
+  // ======================
+
+  summary?: string | null;
+
   feedback?: string | null;
 
-  createdAt: string;
+  strengths?: string[];
+
+  weaknesses?: string[];
+
+  recommendations?: string[];
+
+  insights?: string[];
+
+  // ======================
+  // RELATIONS
+  // ======================
 
   domains: SessionDomain[];
 
@@ -88,7 +146,7 @@ export type SessionDetails = {
 // HOOK
 // ======================
 
-export function useSessionDetails(sessionId?: string) {
+export function useSessionDetails(sessionId?: string | null) {
   const [session, setSession] = useState<SessionDetails | null>(null);
 
   const [loading, setLoading] = useState(false);
@@ -100,7 +158,9 @@ export function useSessionDetails(sessionId?: string) {
   // ======================
 
   useEffect(() => {
-    if (!sessionId) return;
+    if (!sessionId) {
+      return;
+    }
 
     let mounted = true;
 
@@ -112,17 +172,23 @@ export function useSessionDetails(sessionId?: string) {
 
         const data = await getSessionByIdRequest(sessionId!);
 
-        if (!mounted) return;
+        if (!mounted) {
+          return;
+        }
 
         setSession(data);
       } catch (err) {
         console.error(err);
 
-        if (!mounted) return;
+        if (!mounted) {
+          return;
+        }
 
         setError('Failed to load session details');
       } finally {
-        if (!mounted) return;
+        if (!mounted) {
+          return;
+        }
 
         setLoading(false);
       }

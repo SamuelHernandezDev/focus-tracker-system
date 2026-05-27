@@ -1,21 +1,26 @@
 //backend/src/sessions/sessions.module.ts
 
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 
-import { SessionsController } from './sessions.controller';
-import { SessionsService } from './sessions.service';
+import { SessionsController } from './controllers/sessions.controller';
+
+import { SessionsService } from './services/sessions.service';
+
+import { SessionLifecycleService } from './services/session-lifecycle.service';
 
 import { AuthModule } from '../auth/auth.module';
 
 import { PrismaModule } from '../prisma/prisma.module';
 
-import { AiModule } from '../ai/ai.module';
+import { AnalyticsModule } from '../analytics/analytics.module';
 
 @Module({
-  imports: [AuthModule, PrismaModule, AiModule],
+  imports: [AuthModule, PrismaModule, forwardRef(() => AnalyticsModule)],
 
   controllers: [SessionsController],
 
-  providers: [SessionsService],
+  providers: [SessionsService, SessionLifecycleService],
+
+  exports: [SessionsService, SessionLifecycleService],
 })
 export class SessionsModule {}

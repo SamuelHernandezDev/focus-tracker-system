@@ -42,8 +42,10 @@ export class AuthService {
 
     res.cookie('token', token, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+
+      secure: true,
+
+      sameSite: 'none',
     });
 
     return {
@@ -92,8 +94,10 @@ export class AuthService {
   async logout(res: Response) {
     res.clearCookie('token', {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+
+      secure: true,
+
+      sameSite: 'none',
     });
 
     return {

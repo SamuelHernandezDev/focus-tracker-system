@@ -33,6 +33,8 @@ import { CameraTrackingStats } from './cameraPreview/CameraTrackingStats';
 
 import { CameraDisabledOverlay } from './cameraPreview/CameraDisabledOverlay';
 
+import { useFocusOverlayStore } from '@/modules/focus-overlay/store/focusOverlayStore';
+
 type Props = {
   sessionId?: string | null;
 
@@ -78,6 +80,12 @@ export default function CameraPreview({
   );
 
   const [trackingActive, setTrackingActive] = useState(false);
+
+  const {
+    setAttentionState: setOverlayAttentionState,
+
+    setFaceDetected: setOverlayFaceDetected,
+  } = useFocusOverlayStore();
 
   // =========================
   // CAMERA
@@ -128,6 +136,10 @@ export default function CameraPreview({
 
     result,
   } = useFaceTracking(videoRef.current);
+
+  useEffect(() => {
+    setOverlayFaceDetected(result?.detected || false);
+  }, [result?.detected, setOverlayFaceDetected]);
 
   // =========================
   // GAZE
@@ -204,6 +216,10 @@ export default function CameraPreview({
       clearInterval(interval);
     };
   }, [rawAttentionState]);
+
+  useEffect(() => {
+    setOverlayAttentionState(attentionState);
+  }, [attentionState, setOverlayAttentionState]);
 
   // =========================
   // STREAM ATTENTION

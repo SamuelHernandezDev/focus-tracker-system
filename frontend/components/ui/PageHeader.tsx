@@ -32,11 +32,13 @@ export function PageHeader({
   return (
     <div
       className="
-        flex items-center
-        justify-between
+    w-full
 
-        gap-6
-      "
+    flex items-center
+    justify-between
+
+    gap-6
+  "
     >
       {/* LEFT */}
 

@@ -16,6 +16,8 @@ import {
 
 import { useWebContextTracking } from './useWebContextTracking';
 
+import { useFocusOverlayStore } from '@/modules/focus-overlay/store/focusOverlayStore';
+
 export function useFocusSession() {
   // ======================
   // STATE
@@ -26,6 +28,18 @@ export function useFocusSession() {
   const [sessionActive, setSessionActive] = useState(false);
 
   const [loading, setLoading] = useState(false);
+
+  // ======================
+  // STATE STORE
+  // ======================
+
+  const {
+    setSessionActive: setOverlaySessionActive,
+
+    setSessionId: setOverlaySessionId,
+
+    setStartedAt: setOverlayStartedAt,
+  } = useFocusOverlayStore();
 
   // ======================
   // REFS
@@ -77,6 +91,12 @@ export function useFocusSession() {
 
       saveSessionId(res.id);
 
+      setOverlaySessionActive(true);
+
+      setOverlaySessionId(res.id);
+
+      setOverlayStartedAt(Date.now());
+
       // ======================
       // RESET ACTIVITY
       // ======================
@@ -115,6 +135,16 @@ export function useFocusSession() {
       sessionIdRef.current = null;
 
       clearSessionId();
+
+      // ======================
+      // OVERLAY STORE
+      // ======================
+
+      setOverlaySessionActive(false);
+
+      setOverlaySessionId(null);
+
+      setOverlayStartedAt(null);
 
       // ======================
       // STOP BACKEND SESSION

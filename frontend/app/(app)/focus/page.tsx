@@ -4,7 +4,9 @@
 
 import { useEffect, useState } from 'react';
 
-import { Brain } from 'lucide-react';
+import { usePictureInPicture } from '../../../modules/focus-overlay/hooks/usePictureInPicture';
+
+import { Brain, PictureInPicture2 } from 'lucide-react';
 
 import { useFocusSession } from '@/modules/focus/hooks/useFocusSession';
 
@@ -20,6 +22,8 @@ import { FocusStatusSection } from '@/modules/focus/components/focusSetup/FocusS
 
 import { FocusControlsSection } from '@/modules/focus/components/focusSetup/FocusControlsSection';
 
+import { useFocusOverlayStore } from '@/modules/focus-overlay/store/focusOverlayStore';
+
 export default function FocusPage() {
   // ======================
   // LOCAL STATE
@@ -32,6 +36,10 @@ export default function FocusPage() {
   const [cameraEnabled, setCameraEnabled] = useState(false);
 
   const [attemptedStart, setAttemptedStart] = useState(false);
+
+  const { openPiP, closePiP, isOpen } = usePictureInPicture();
+
+  const { setTask: setOverlayTask } = useFocusOverlayStore();
 
   useEffect(() => {
     if (!attemptedStart) return;
@@ -48,6 +56,10 @@ export default function FocusPage() {
       setAttemptedStart(false);
     }
   }, [task, allowedSites]);
+
+  useEffect(() => {
+    setOverlayTask(task);
+  }, [task, setOverlayTask]);
 
   // ======================
   // SESSION
@@ -119,18 +131,67 @@ export default function FocusPage() {
 
       <div
         className="
-        px-8
-        pt-6
-        pb-3
+    px-8
+    pt-6
+    pb-3
 
-        shrink-0
-      "
+    shrink-0
+  "
       >
         <PageHeader
           icon={Brain}
           title="Focus Tracker"
           description="Configure and start your AI-powered focus tracking session"
-        />
+        >
+          <button
+            onClick={openPiP}
+            title="Open Focus Overlay"
+            className="
+        h-12
+        w-12
+
+        flex
+        items-center
+        justify-center
+
+        rounded-2xl
+
+        border
+        border-slate-200
+
+        bg-white
+
+        shadow-sm
+
+        hover:border-violet-300
+        hover:bg-violet-50
+
+        transition
+      "
+          >
+            <PictureInPicture2
+              size={18}
+              className={`
+  
+  rounded-2xl
+
+  transition
+
+  ${
+    isOpen
+      ? `
+        bg-indigo-100
+        border-indigo-300
+      `
+      : `
+        bg-white
+        border-slate-200
+      `
+  }
+`}
+            />
+          </button>
+        </PageHeader>
       </div>
 
       {/* CONTENT */}
